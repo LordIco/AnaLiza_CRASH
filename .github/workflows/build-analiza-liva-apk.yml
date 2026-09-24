@@ -1,0 +1,40 @@
+name: Build AnaLiza LIVA APK
+
+on:
+  push:
+    branches:
+      - chatgpt-analiza-liva-apk
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android-liva
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build debug APK
+        run: gradle assembleDebug --stacktrace
+
+      - name: Rename APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk AnaLiza-LIVA-v1.0.0.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AnaLiza-LIVA-APK
+          path: android-liva/AnaLiza-LIVA-v1.0.0.apk
+          retention-days: 7

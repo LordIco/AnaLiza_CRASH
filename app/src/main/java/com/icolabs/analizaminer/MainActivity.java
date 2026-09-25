@@ -25,6 +25,11 @@ public class MainActivity extends Activity {
 
         webView = new WebView(this);
         webView.setBackgroundColor(android.graphics.Color.rgb(2, 7, 13));
+        webView.setVerticalScrollBarEnabled(true);
+        webView.setHorizontalScrollBarEnabled(false);
+        webView.setOverScrollMode(View.OVER_SCROLL_ALWAYS);
+        webView.setNestedScrollingEnabled(true);
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         setContentView(webView);
 
         WebSettings s = webView.getSettings();
@@ -41,7 +46,8 @@ public class MainActivity extends Activity {
         s.setDisplayZoomControls(false);
         s.setLoadWithOverviewMode(false);
         s.setUseWideViewPort(false);
-        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.12");
+        s.setTextZoom(100);
+        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.12.1");
 
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
@@ -51,7 +57,7 @@ public class MainActivity extends Activity {
             if (!isFinishing()) {
                 webView.loadUrl("file:///android_asset/ui/index.html");
             }
-        }, 2300);
+        }, 8250);
     }
 
     @Override

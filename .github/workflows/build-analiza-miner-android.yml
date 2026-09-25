@@ -16,6 +16,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
+      - name: Create placeholder launcher icon
+        run: |
+          mkdir -p app/src/main/res/drawable
+          echo 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAmUlEQVR4nO3QMQ0AIQDAQCAIYMa/z0fGDd9T0HTuc7/xY0sHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gPdxnAa0HZLxCAAAAAElFTkSuQmCC' | base64 -d > app/src/main/res/drawable/ic_launcher.png
       - name: Build debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace
       - name: Collect Android signing tool

@@ -18,8 +18,19 @@ jobs:
           gradle-version: '8.9'
       - name: Build debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Collect Android signing tool
+        run: |
+          mkdir -p tools-out
+          APKSIGNER_JAR="$(find "$ANDROID_HOME/build-tools" -path '*/lib/apksigner.jar' | sort -V | tail -1)"
+          test -f "$APKSIGNER_JAR"
+          cp "$APKSIGNER_JAR" tools-out/apksigner.jar
       - uses: actions/upload-artifact@v4
         with:
           name: analiza-miner-android-shell
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-apksigner-tool
+          path: tools-out/apksigner.jar
           if-no-files-found: error

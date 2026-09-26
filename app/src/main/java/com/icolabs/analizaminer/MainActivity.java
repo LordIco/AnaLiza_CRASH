@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -14,6 +15,14 @@ import android.webkit.WebViewClient;
 
 public class MainActivity extends Activity {
     private WebView webView;
+    private boolean appReady = false;
+
+    private class AppBridge {
+        @JavascriptInterface
+        public void exitApp() {
+            runOnUiThread(() -> finishAndRemoveTask());
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +56,25 @@ public class MainActivity extends Activity {
         s.setLoadWithOverviewMode(false);
         s.setUseWideViewPort(false);
         s.setTextZoom(100);
-        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.12.3");
+        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.12.5");
 
-        webView.setWebViewClient(new WebViewClient());
+        webView.addJavascriptInterface(new AppBridge(), "AnaLizaAndroid");
         webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (url != null && url.endsWith("/ui/index.html")) {
+                    view.clearHistory();
+                    appReady = true;
+                }
+            }
+        });
 
         webView.loadUrl("file:///android_asset/splash.html");
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (!isFinishing()) {
+                appReady = false;
                 webView.loadUrl("file:///android_asset/ui/index.html");
             }
         }, 8250);
@@ -62,16 +82,19 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
+        if (webView == null || !appReady) {
+            return;
         }
+        webView.evaluateJavascript(
+            "(function(){try{return window.AnaLizaHandleBack?window.AnaLizaHandleBack():false}catch(e){return false}})();",
+            null
+        );
     }
 
     @Override
     protected void onDestroy() {
         if (webView != null) {
+            webView.removeJavascriptInterface("AnaLizaAndroid");
             webView.loadUrl("about:blank");
             webView.stopLoading();
             webView.destroy();

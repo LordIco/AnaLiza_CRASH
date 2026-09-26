@@ -10,8 +10,8 @@ android {
         applicationId "com.icolabs.analizaminer"
         minSdk 26
         targetSdk 35
-        versionCode 1015
-        versionName "1.0.12.3"
+        versionCode 1016
+        versionName "1.0.12.4"
     }
 }
 

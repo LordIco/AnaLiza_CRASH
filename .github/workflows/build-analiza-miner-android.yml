@@ -22,12 +22,16 @@ jobs:
           echo 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAmUlEQVR4nO3QMQ0AIQDAQCAIYMa/z0fGDd9T0HTuc7/xY0sHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gNUAHaA3QAVoDdIDWAB2gPdxnAa0HZLxCAAAAAElFTkSuQmCC' | base64 -d > app/src/main/res/drawable/ic_launcher.png
       - name: Build debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace
-      - name: Collect Android signing tool
+      - name: Collect Android tools
         run: |
           mkdir -p tools-out
           APKSIGNER_JAR="$(find "$ANDROID_HOME/build-tools" -path '*/lib/apksigner.jar' | sort -V | tail -1)"
+          ZIPALIGN_BIN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
           test -f "$APKSIGNER_JAR"
+          test -f "$ZIPALIGN_BIN"
           cp "$APKSIGNER_JAR" tools-out/apksigner.jar
+          cp "$ZIPALIGN_BIN" tools-out/zipalign
+          chmod +x tools-out/zipalign
       - uses: actions/upload-artifact@v4
         with:
           name: analiza-miner-android-shell
@@ -35,6 +39,6 @@ jobs:
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
         with:
-          name: android-apksigner-tool
-          path: tools-out/apksigner.jar
+          name: android-build-tools
+          path: tools-out/
           if-no-files-found: error

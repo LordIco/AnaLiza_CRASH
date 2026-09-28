@@ -46,7 +46,7 @@ public class MainActivity extends Activity {
                     conn.setConnectTimeout(2500);
                     conn.setReadTimeout(2500);
                     conn.setUseCaches(false);
-                    conn.setRequestProperty("User-Agent", "AnaLizaMinerAndroid/1.0.16");
+                    conn.setRequestProperty("User-Agent", "AnaLizaMinerAndroid/1.0.17");
                     conn.setRequestProperty("Accept", "*/*");
                     conn.connect();
                     String raw = conn.getHeaderField("Date");
@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
         s.setTextZoom(100);
         s.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.clearCache(true);
-        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.16");
+        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.17");
 
         webView.addJavascriptInterface(new AppBridge(), "AnaLizaAndroid");
         webView.setWebChromeClient(new WebChromeClient());
@@ -116,11 +116,11 @@ public class MainActivity extends Activity {
             }
         });
 
-        webView.loadUrl("file:///android_asset/splash.html?v=1025");
+        webView.loadUrl("file:///android_asset/splash.html?v=1026");
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (!isFinishing()) {
                 appReady = false;
-                webView.loadUrl("file:///android_asset/ui/index.html?v=1025");
+                webView.loadUrl("file:///android_asset/ui/index.html?v=1026");
             }
         }, 8250);
     }

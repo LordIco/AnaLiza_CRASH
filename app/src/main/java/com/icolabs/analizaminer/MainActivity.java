@@ -13,6 +13,11 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class MainActivity extends Activity {
     private WebView webView;
     private boolean appReady = false;
@@ -21,6 +26,44 @@ public class MainActivity extends Activity {
         @JavascriptInterface
         public void exitApp() {
             runOnUiThread(() -> finishAndRemoveTask());
+        }
+
+        @JavascriptInterface
+        public String getNetworkTime(String serverUrl) {
+            String base = serverUrl == null ? "" : serverUrl.trim().replaceAll("/+$", "");
+            String[] sources = new String[]{"LIVA", "WEB"};
+            String[] urls = new String[]{
+                base.length() > 0 ? base + "/health" : "",
+                "https://www.google.com/generate_204"
+            };
+
+            for (int i = 0; i < urls.length; i++) {
+                if (urls[i].isEmpty()) continue;
+                HttpURLConnection conn = null;
+                try {
+                    long t0 = System.currentTimeMillis();
+                    conn = (HttpURLConnection) new URL(urls[i]).openConnection();
+                    conn.setConnectTimeout(2500);
+                    conn.setReadTimeout(2500);
+                    conn.setUseCaches(false);
+                    conn.setRequestProperty("User-Agent", "AnaLizaMinerAndroid/1.0.16");
+                    conn.setRequestProperty("Accept", "*/*");
+                    conn.connect();
+                    String raw = conn.getHeaderField("Date");
+                    long t1 = System.currentTimeMillis();
+                    if (raw != null && !raw.isEmpty()) {
+                        long remote = ZonedDateTime.parse(raw, DateTimeFormatter.RFC_1123_DATE_TIME)
+                                .toInstant().toEpochMilli();
+                        long epoch = remote + Math.max(0L, t1 - t0) / 2L;
+                        return "{\"epoch_ms\":" + epoch + ",\"source\":\"" + sources[i] + "\",\"synced\":true}";
+                    }
+                } catch (Exception ignored) {
+                } finally {
+                    if (conn != null) conn.disconnect();
+                }
+            }
+
+            return "{\"epoch_ms\":" + System.currentTimeMillis() + ",\"source\":\"SISTEMA\",\"synced\":false}";
         }
     }
 
@@ -58,7 +101,7 @@ public class MainActivity extends Activity {
         s.setTextZoom(100);
         s.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.clearCache(true);
-        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.12.12");
+        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.16");
 
         webView.addJavascriptInterface(new AppBridge(), "AnaLizaAndroid");
         webView.setWebChromeClient(new WebChromeClient());
@@ -73,11 +116,11 @@ public class MainActivity extends Activity {
             }
         });
 
-        webView.loadUrl("file:///android_asset/splash.html?v=1024");
+        webView.loadUrl("file:///android_asset/splash.html?v=1025");
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (!isFinishing()) {
                 appReady = false;
-                webView.loadUrl("file:///android_asset/ui/index.html?v=1024");
+                webView.loadUrl("file:///android_asset/ui/index.html?v=1025");
             }
         }, 8250);
     }

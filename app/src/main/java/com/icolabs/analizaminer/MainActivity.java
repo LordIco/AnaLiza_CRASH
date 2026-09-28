@@ -56,14 +56,9 @@ public class MainActivity extends Activity {
         s.setLoadWithOverviewMode(false);
         s.setUseWideViewPort(false);
         s.setTextZoom(100);
-
-        // IMPORTANT: não reutilizar HTML/JS/CSS de uma versão anterior do APK.
-        // O WebView mantém cache entre updates e isso fez a UI antiga (G10/C1)
-        // continuar sendo exibida mesmo após instalar uma build nova.
         s.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webView.clearCache(true);
-
-        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.12.10");
+        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.12.11");
 
         webView.addJavascriptInterface(new AppBridge(), "AnaLizaAndroid");
         webView.setWebChromeClient(new WebChromeClient());
@@ -78,20 +73,18 @@ public class MainActivity extends Activity {
             }
         });
 
-        webView.loadUrl("file:///android_asset/splash.html?v=1022");
+        webView.loadUrl("file:///android_asset/splash.html?v=1023");
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (!isFinishing()) {
                 appReady = false;
-                webView.loadUrl("file:///android_asset/ui/index.html?v=1022");
+                webView.loadUrl("file:///android_asset/ui/index.html?v=1023");
             }
         }, 8250);
     }
 
     @Override
     public void onBackPressed() {
-        if (webView == null || !appReady) {
-            return;
-        }
+        if (webView == null || !appReady) return;
         webView.evaluateJavascript(
             "(function(){try{return window.AnaLizaHandleBack?window.AnaLizaHandleBack():false}catch(e){return false}})();",
             null

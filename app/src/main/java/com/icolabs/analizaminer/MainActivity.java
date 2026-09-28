@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
         s.setLoadWithOverviewMode(false);
         s.setUseWideViewPort(false);
         s.setTextZoom(100);
-        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.12.8");
+        s.setUserAgentString(s.getUserAgentString() + " AnaLizaMinerAndroid/1.0.12.9");
 
         webView.addJavascriptInterface(new AppBridge(), "AnaLizaAndroid");
         webView.setWebChromeClient(new WebChromeClient());
